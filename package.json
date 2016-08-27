@@ -3,5 +3,16 @@
   "version": "0.1.0",
   "main": "sc-network.js",
   "author": "Denis Koronchik <denis.koronchik@gmail.com>",
-  "description": "JavaScript implementation of sctp (ostis) protocol"
+  "description": "JavaScript implementation of sctp (ostis) protocol",
+  "scripts": {
+    "build": "./node_modules/.bin/regenerator sc-network.js > dist/sc-network.js",
+    "start": "node .",
+    "test": "node test/test.js"
+  },
+  "dependencies": {
+    "q": "^1.4.1"
+  },
+  "devDependencies": {
+    "regenerator": "^0.8.46"
+  }
 }
