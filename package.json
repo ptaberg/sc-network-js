@@ -1,0 +1,7 @@
+{
+  "name": "sc-network",
+  "version": "0.1.0",
+  "main": "sc-network.js",
+  "author": "Denis Koronchik <denis.koronchik@gmail.com>",
+  "description": "JavaScript implementation of sctp (ostis) protocol"
+}
