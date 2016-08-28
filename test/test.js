@@ -1,6 +1,6 @@
 var net = require('net');
 var Q = require('q');
-var SctpClient = require('../sc-network');
+var SctpClient = require('../sc-network').SctpClient;
 
 var host = "localhost";
 var port = 55770;
@@ -23,7 +23,7 @@ function unit_test(promise, name, result, context, index) {
 var socket = new net.Socket();
 socket.connect(port, host, function() {
 	console.log('Connected');
-  var client = new SctpClient.SctpClient(socket);
+  var client = new SctpClient(socket);
 
   // test client there
   var context = new Array(100);

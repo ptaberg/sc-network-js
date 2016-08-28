@@ -5,7 +5,7 @@
   "author": "Denis Koronchik <denis.koronchik@gmail.com>",
   "description": "JavaScript implementation of sctp (ostis) protocol",
   "scripts": {
-    "build": "./node_modules/.bin/regenerator sc-network.js > dist/sc-network.js",
+    "build": "",
     "start": "node .",
     "test": "node test/test.js"
   },
