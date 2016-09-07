@@ -1,5 +1,7 @@
 var Q = require('q');
 var util = require('util');
+var ScHelper = require('./sc-helper');
+var ScKeynodes = require('./sc-keynodes');
 
 // sc-element types
 var sc_type_node = 0x1
@@ -898,6 +900,8 @@ SctpClient.prototype.get_statistics = function() {
 
 module.exports = {
   SctpClient:                   SctpClient,
+  Helper:                       ScHelper,
+  Keynodes:                     ScKeynodes,
   sc_type_node:                 sc_type_node,
   sc_type_link:                 sc_type_link,
   sc_type_edge_common:          sc_type_edge_common,

@@ -1,6 +1,6 @@
 var net = require('net');
 var Q = require('q');
-var SctpClient = require('../sc-network').SctpClient;
+var SctpClient = require('../sc-network');
 
 var host = "localhost";
 var port = 55770;
@@ -23,7 +23,29 @@ function unit_test(promise, name, result, context, index) {
 var socket = new net.Socket();
 socket.connect(port, host, function() {
 	console.log('Connected');
-  var client = new SctpClient(socket);
+  var client = new SctpClient.SctpClient(socket);
+  var keynodes = new SctpClient.Keynodes(client);
+
+  // test keynodes
+  console.log('resolve_keynodes');
+  var test_keynodes = {
+    nrel_main_idtf: null,
+    lang_ru: null,
+    lang_en: null
+  };
+  keynodes.resolveKeynodes(test_keynodes).then(function (result) {
+    console.log(result);
+    for (var p in result) {
+      if (result.hasOwnProperty(p)) {
+        var idtf = p;
+        var res_str = 'ok';
+        var res = result[p];
+        if (res == undefined || res == null || res == 0)
+          res_str = 'fail';
+        console.log('\t' + p + " ... " + res_str);
+      }
+    }
+  });
 
   // test client there
   var context = new Array(100);
@@ -39,5 +61,7 @@ socket.connect(port, host, function() {
   ]).then(function() {
       unit_test(client.create_arc(SctpClient.sc_type_arc_pos_const_perm, node1, node2), "create_arc", null, context, 3);
   });
+
+
 
 });
