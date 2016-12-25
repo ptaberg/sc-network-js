@@ -733,7 +733,7 @@ SctpClient.prototype.set_system_identifier = function(addr, idtf) {
 };
 
 SctpClient.prototype.event_create = function(evt_type, addr, callback) {
-    var dfd = new Promise();
+    var dfd = new Q.defer();
     var self = this;
 
     var buffer = new SctpCommandBuffer(sc_addr_size + 1);
@@ -743,18 +743,18 @@ SctpClient.prototype.event_create = function(evt_type, addr, callback) {
 
     this.new_request(buffer.data, function(data) {
         return data.getResUint32(0);
-    }).done(function(data) {
+    }).then(function(data) {
         self.events[data] = callback;
         dfd.resolve(data);
-    }).fail(function(data) {
+    }, function(data) {
         dfd.reject(data);
     });
 
-    return dfd.promise();
+    return dfd.promise;
 };
 
 SctpClient.prototype.event_destroy = function(evt_id) {
-    var dfd = new Promise();
+    var dfd = new Q.defer();
     var self = this;
 
     var buffer = new SctpCommandBuffer(4);
@@ -763,14 +763,14 @@ SctpClient.prototype.event_destroy = function(evt_id) {
 
     this.new_request(buffer.data, function(data) {
         return data.getResUint32(0);
-    }).done(function(data) {
+    }).then(function(data) {
         delete self.event_emit[evt_id];
         dfd.promise(data);
-    }).fail(function(data){
+    }, function(data) {
         dfd.reject(data);
     });
 
-    return dfd.promise();
+    return dfd.promise;
 };
 
 SctpClient.prototype.event_emit = function() {
