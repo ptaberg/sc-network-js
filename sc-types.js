@@ -94,7 +94,18 @@ var SctpEventType = {
     SC_EVENT_CONTENT_CHANGED:    5
 }
 
+function SctpConstrIter(iterator_type, args, resMappings)
+{
+    var i;
+    return i = {
+        iterator_type: iterator_type,
+        args: args,
+        mappings: resMappings
+    };
+}
+
 module.exports = {
+  SctpConstrIter:               SctpConstrIter,
   SctpCommandType:              SctpCommandType,
   SctpResultCode:               SctpResultCode,
   SctpIteratorType:             SctpIteratorType,

@@ -67,6 +67,7 @@ socket.connect(port, host, function() {
   var printFail = function(name) { console.log("Test " + name + " failed"); }
 
   helper.init().then(() => {
+    // test getSystemIdentifier
     keynodes.resolveKeynodes(['nrel_system_identifier'])
       .then((result) => {
         helper.getSystemIdentifier(result.nrel_system_identifier)
@@ -81,6 +82,25 @@ socket.connect(port, host, function() {
           });
       }, () => {
         printFail("ScKeynodes.resolveKeynodes");
+      });
+
+    // test getIdentifier
+    keynodes.resolveKeynodes(['lang_en', 'format'])
+      .then((result) => {
+        if (!result.lang_en || !result.fomat) {
+          helper.getIdentifier(result.format, result.lang_en)
+            .then((idtf) => {
+              if (idtf != 'format') {
+                console.log("ScHelper.getIdentifier failed got " + idtf);
+              } else {
+                console.log("ScHelper.getIdentifier OK - " + idtf);
+              }
+            }, () => {
+              printFail("ScHelper.getIdentifier");
+            });
+        } else {
+          console.log("lang_en: " + result.lang_en + " format: " + result.format);
+        }
       });
   }, () => {
     console.log("ScHelper.init error");

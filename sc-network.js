@@ -132,16 +132,6 @@ sc_iterator_is_fixed_arg = function(it, pos) {
     return res;
 }
 
-function SctpConstrIter(iterator_type, args, resMappings)
-{
-    var i;
-    return i = {
-        iterator_type: iterator_type,
-        args: args,
-        mappings: resMappings
-    };
-}
-
 function SctpCommandBuffer(size) {
     var b, pos = 0, s = size,
         view = new DataView(new ArrayBuffer(size + sctp_header_size));
