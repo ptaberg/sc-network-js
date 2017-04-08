@@ -273,35 +273,54 @@ SctpClient.prototype._push_task = function(task) {
 
     function process() {
         var t = self.task_queue.shift();
+        var completeData = new Uint8Array(0);
+
+        var _appendBuffer = function(buffer1, buffer2) {
+            if (!buffer1) {
+              return buffer2;
+            }
+
+            var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+            tmp.set(new Uint8Array(buffer1), 0);
+            tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
+            return tmp;
+        };
 
         self.socket._receive_sctp_message = function(data) {
+            completeData = _appendBuffer(completeData, data);
 
-            var result = new SctpResultBuffer(data);
-            if (result.getResultSize() != data.byteLength - result.getHeaderSize())
-                throw "Invalid data size " + l
+            var result = new SctpResultBuffer(completeData.buffer);
+            var responseLength = result.getResultSize() + result.getHeaderSize();
+            if (responseLength <= completeData.byteLength) {
+              var subdata = completeData.subarray(0, responseLength);
 
-            var r = result;
-            var resCode = result.getResultCode();
-            if (data && resCode == SctpResultCode.SCTP_RESULT_OK) {
+              result = new SctpResultBuffer(subdata.buffer);
+              completeData = completeData.slice(responseLength);
+
+              var r = result;
+              var resCode = result.getResultCode();
+              if (data && resCode == SctpResultCode.SCTP_RESULT_OK) {
                 if (t.parse)
-                    r = t.parse(result);
+                  r = t.parse(result);
                 if (t.resCode)
-                    resCode = t.resCode(result);
-            }
+                  resCode = t.resCode(result);
+              }
 
-            if (resCode == SctpResultCode.SCTP_RESULT_OK) {
+              if (resCode == SctpResultCode.SCTP_RESULT_OK) {
                 t.dfd.resolve(r);
-            } else
+              } else {
                 t.dfd.resolve();
+              }
 
-            if (self.task_queue.length > 0)
-            {
+              if (self.task_queue.length > 0)
+              {
                 self.task_timeout = setTimeout(process, self.task_frequency)
-            }
-            else
-            {
+              }
+              else
+              {
                 clearTimeout(self.task_timeout);
                 self.task_timeout = 0;
+              }
             }
         }
 
