@@ -22,7 +22,7 @@ export class ScKeynodes {
         const self = this;
         function resolveKeynodeImpl(idtf: string) {
             const dfd = Q.defer<any>();
-            const value = this.cache[idtf];
+            const value = self.cache[idtf];
             if (value) {
                 dfd.resolve([idtf, value]);
             } else {
