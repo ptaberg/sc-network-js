@@ -147,7 +147,7 @@ class ScNet {
     public static get sctp_header_size(): number { return 10; }
 
     public static scAddrFromStr(id: string) : ScAddr {
-        return parseInt(id);
+        return new ScAddr(parseInt(id));
     }
 
     public static scAddrToStr(addr: ScAddr) : string {
@@ -253,34 +253,51 @@ function SctpResultBuffer(data: any) {
     return new SctpResultBufferTypedArray(data);
 }
 
-class SctpClientSocket {
-    private socket: WebSocket = null;
+type ClientCallback = ()=>void;
 
-    constructor(socket: WebSocket) {
-        this.socket = socket;
-        this.socket.onclose = this.OnClose.bind(this);
-        this.socket.onerror = this.OnError.bind(this);
-        this.socket.onopen = this.OnOpen.bind(this);
+class SctpClientSocket {
+    private _socket: WebSocket = null;
+    private _onConnect: ClientCallback = null;
+    private _onDisconnect: ClientCallback = null;
+    private _onError: ClientCallback = null;
+
+    constructor(socket: WebSocket,
+                onConnect: ClientCallback,
+                onDisconnect: ClientCallback,
+                onError: ClientCallback) {
+
+        this._onConnect = onConnect;
+        this._onDisconnect = onDisconnect;
+        this._onError = onError;
+
+        this._socket = socket;
+        this._socket.binaryType = "arraybuffer";
+        this._socket.onclose = this.OnClose.bind(this);
+        this._socket.onerror = this.OnError.bind(this);
+        this._socket.onopen = this.OnOpen.bind(this);
     }
 
     public SetOnMessage(func: any) {
-        this.socket.onmessage = func;
+        this._socket.onmessage = func;
     }
 
     public Send(data: ArrayBuffer) {
-        this.socket.send(data);
+        this._socket.send(data);
     }
 
     private OnClose() {
-
+        if (this._onDisconnect)
+            this._onDisconnect();
     }
 
     private OnError() {
-
+        if (this._onError)
+            this._onError();
     }
 
     private OnOpen() {
-
+        if (this._onConnect)
+            this._onConnect();
     }
 
 };
@@ -312,10 +329,13 @@ export class SctpClient {
     private taskFrequency: number = 10;
     private events: {[id: number] : EventCallbackFunction; } = {};
 
-    constructor(wsURL: string, eventsUpdatePeriodMS: number) {
+    constructor(wsURL: string, eventsUpdatePeriodMS: number,
+                onConnect: ClientCallback,
+                onDisconnect: ClientCallback,
+                onError: ClientCallback) {
         this.eventsUpdatePeriod = eventsUpdatePeriodMS;
 
-        this.socket = new SctpClientSocket(new WebSocket(wsURL));
+        this.socket = new SctpClientSocket(new WebSocket(wsURL), onConnect, onDisconnect, onError);
 
         const self = this;
         let eventTimeout = 0;
@@ -355,7 +375,7 @@ export class SctpClient {
             };
 
             self.socket.SetOnMessage(function(data) {
-                completeData = _appendBuffer(completeData, data);
+                completeData = _appendBuffer(completeData, new Uint8Array(data.data));
 
                 let result = SctpResultBuffer(completeData.buffer);
                 const responseLength = result.getResultSize() + result.getHeaderSize();
@@ -416,7 +436,7 @@ export class SctpClient {
     public EraseElement(addr: ScAddr) {
         const buffer = new SctpCommandBuffer(ScNet.sc_addr_size);
         buffer.setHeader(SctpCommandType.ERASE_ELEMENT, 0, 0);
-        buffer.writeUint32(addr);
+        buffer.writeUint32(addr.value);
 
         return this.NewRequest(buffer.data, function(data) {
             return true;
@@ -425,7 +445,7 @@ export class SctpClient {
     public CheckElement(addr: ScAddr) {
         const buffer = new SctpCommandBuffer(ScNet.sc_addr_size);
         buffer.setHeader(SctpCommandType.CHECK_ELEMENT, 0, 0);
-        buffer.writeUint32(addr);
+        buffer.writeUint32(addr.value);
 
         return this.NewRequest(buffer.data, function(data) {
             return null;
@@ -435,7 +455,7 @@ export class SctpClient {
     public GetElementType(addr: ScAddr) {
         const buffer = new SctpCommandBuffer(ScNet.sc_addr_size);
         buffer.setHeader(SctpCommandType.GET_ELEMENT_TYPE, 0, 0);
-        buffer.writeUint32(addr);
+        buffer.writeUint32(addr.value);
 
         return this.NewRequest(buffer.data, function(data) {
             return data.getResUint16(0);
@@ -445,7 +465,7 @@ export class SctpClient {
     public GetEdge(addr: ScAddr) {
         const buffer = new SctpCommandBuffer(ScNet.sc_addr_size);
         buffer.setHeader(SctpCommandType.GET_EDGE, 0, 0);
-        buffer.writeUint32(addr);
+        buffer.writeUint32(addr.value);
 
         return this.NewRequest(buffer.data, function(data) {
             return [data.getResUInt32(0), data.getResUInt32(ScNet.sc_addr_size)];
@@ -466,8 +486,8 @@ export class SctpClient {
         const buffer = new SctpCommandBuffer(ScNet.sc_type_size + 2 * ScNet.sc_addr_size);
         buffer.setHeader(SctpCommandType.CREATE_EDGE, 0, 0);
         buffer.writeUint16(type.value);
-        buffer.writeUint32(src);
-        buffer.writeUint32(trg);
+        buffer.writeUint32(src.value);
+        buffer.writeUint32(trg.value);
 
         return this.NewRequest(buffer.data, function(data) {
             return data.getResUInt32(0);
@@ -508,7 +528,7 @@ export class SctpClient {
 
         const buffer = new SctpCommandBuffer(dataBuff.byteLength + ScNet.sc_addr_size + Uint32Array.BYTES_PER_ELEMENT);
         buffer.setHeader(SctpCommandType.SET_LINK_CONTENT, 0, 0);
-        buffer.writeUint32(addr);
+        buffer.writeUint32(addr.value);
         buffer.writeUint32(dataBuff.byteLength);
         buffer.writeBuffer(dataBuff);
 
@@ -520,7 +540,7 @@ export class SctpClient {
     public GetLinkContent(addr: ScAddr, type: string) {
         const buffer = new SctpCommandBuffer(ScNet.sc_addr_size);
         buffer.setHeader(SctpCommandType.GET_LINK_CONTENT, 0, 0);
-        buffer.writeUint32(addr);
+        buffer.writeUint32(addr.value);
 
         return this.NewRequest(buffer.data, function(data) {
             const n = data.getResultSize();
@@ -805,7 +825,7 @@ export class SctpClient {
         const buffer = new SctpCommandBuffer(ScNet.sc_addr_size + 1);
         buffer.setHeader(SctpCommandType.EVENT_CREATE, 0, 0);
         buffer.writeUint8(evtType);
-        buffer.writeUint32(addr);
+        buffer.writeUint32(addr.value);
 
         this.NewRequest(buffer.data, function(data) {
             return data.getResUInt32(0);
@@ -855,7 +875,7 @@ export class SctpClient {
                 const func = self.events[evtID];
 
                 if (func)
-                    func(addr, arg);
+                    func(new ScAddr(addr), new ScAddr(arg));
             }
         }, null);
     }

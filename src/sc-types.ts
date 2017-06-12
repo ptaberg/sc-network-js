@@ -1,7 +1,6 @@
 import * as sc from '@ostis/sc-core';
 
-export type ScType = sc.ScType;
-export type ScAddr = number;
+export { ScType, ScAddr } from '@ostis/sc-core';
 
 export enum SctpCommandType {
     UNKNOWN           = 0x00, // unkown command

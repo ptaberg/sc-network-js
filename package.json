@@ -1,21 +1,28 @@
 {
   "name": "@ostis/sc-network",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "build/sc-network.js",
   "typings": "index",
   "author": "Denis Koronchik <denis.koronchik@gmail.com>",
   "description": "JavaScript implementation of sctp (ostis) protocol",
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/ostis-dev/sc-network-js.git"
+  },
+
   "scripts": {
     "build": "webpack --progress --colors",
     "prepublish": "webpack --progress --colors",
     "watch": "webpack --progress --colors --watch"
   },
+
   "dependencies": {
     "@ostis/sc-core": "^0.1.1",
     "@types/text-encoding": "0.0.30",
     "q": "^1.5.0",
     "text-encoding": "^0.6.4"
   },
+  
   "devDependencies": {
     "@types/node": "^7.0.28",
     "@types/q": "^1.0.0",
