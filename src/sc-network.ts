@@ -314,7 +314,7 @@ interface ITask {
     dfd: Deferred;
 };
 
-interface IIteratorConstr {
+export interface IIteratorConstr {
     type: SctpIteratorType;
     args: any[];
     mappings: {};
