@@ -316,7 +316,7 @@ interface ITask {
 
 export interface IIteratorConstr {
     type: SctpIteratorType;
-    args: any[];
+    args: (ScAddr | ScType)[];
     mappings: {};
     repl: any[];
 };
@@ -767,10 +767,10 @@ export class SctpClient {
             for (let j = 0; j < it.args.length; ++j) {
                 if (ScNet.scIteratorIsFixedArg(it.type, j)) {
                     if (it.repl[rCount] == null)
-                        buffer.writeUint32(it.args[j]);
+                        buffer.writeUint32(it.args[j].value);
                     rCount++;
                 } else
-                    buffer.writeUint16(it.args[j]);
+                    buffer.writeUint16(it.args[j].value);
             }
         }
 

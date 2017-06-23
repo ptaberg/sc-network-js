@@ -33,6 +33,9 @@ const client = new SctpClient('http://localhost/ws', 500,
 
 ## Changelog
 
+### v0.1.3
+- Fix construction iterator
+
 ### v0.1.2
 - Some interfaces export fixed
 
