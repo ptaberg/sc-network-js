@@ -35,6 +35,7 @@ const client = new SctpClient('http://localhost/ws', 500,
 
 ### v0.1.3
 - Fix construction iterator
+- Fix return values of ScAddr
 
 ### v0.1.2
 - Some interfaces export fixed
