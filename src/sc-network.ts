@@ -314,9 +314,9 @@ interface ITask {
     dfd: Deferred;
 };
 
-interface IIteratorConstr {
+export interface IIteratorConstr {
     type: SctpIteratorType;
-    args: any[];
+    args: (ScAddr | ScType)[];
     mappings: {};
     repl: any[];
 };
@@ -458,7 +458,7 @@ export class SctpClient {
         buffer.writeUint32(addr.value);
 
         return this.NewRequest(buffer.data, function(data) {
-            return data.getResUint16(0);
+            return new ScType(data.getResUint16(0));
         }, null);
     }
 
@@ -468,7 +468,7 @@ export class SctpClient {
         buffer.writeUint32(addr.value);
 
         return this.NewRequest(buffer.data, function(data) {
-            return [data.getResUInt32(0), data.getResUInt32(ScNet.sc_addr_size)];
+            return [new ScAddr(data.getResUInt32(0)), new ScAddr(data.getResUInt32(ScNet.sc_addr_size))];
         }, null);
     }
 
@@ -478,7 +478,7 @@ export class SctpClient {
         buffer.writeUint16(type.value);
 
         return this.NewRequest(buffer.data, function(data) {
-            return data.getResUInt32(0);
+            return new ScAddr(data.getResUInt32(0));
         }, null);
     }
 
@@ -490,7 +490,7 @@ export class SctpClient {
         buffer.writeUint32(trg.value);
 
         return this.NewRequest(buffer.data, function(data) {
-            return data.getResUInt32(0);
+            return new ScAddr(data.getResUInt32(0));
         }, null);
     }
 
@@ -499,7 +499,7 @@ export class SctpClient {
         buffer.setHeader(SctpCommandType.CREATE_LINK, 0, 0);
 
         return this.NewRequest(buffer.data, function(data) {
-            return data.getResUInt32(0);
+            return new ScAddr(data.getResUInt32(0));
         }, null);
     }
 
@@ -577,7 +577,7 @@ export class SctpClient {
         }, null);
     }
 
-    public Iterate(iterType: SctpIteratorType, args: any[]) {
+    public Iterate(iterType: SctpIteratorType, args: (ScAddr | ScType)[]) {
         const itCount = ScNet.scIteratorTypeCount(iterType);
 
         if (args.length != itCount)
@@ -591,61 +591,61 @@ export class SctpClient {
         switch (iterType)
         {
             case SctpIteratorType._3A_A_F:
-                buffer.writeUint16(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint32(args[2]);
+                buffer.writeUint16(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint32(args[2].value);
                 break;
             case SctpIteratorType._3F_A_A:
-                buffer.writeUint32(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint16(args[2]);
+                buffer.writeUint32(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint16(args[2].value);
                 break;
             case SctpIteratorType._3F_A_F:
-                buffer.writeUint32(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint32(args[2]);
+                buffer.writeUint32(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint32(args[2].value);
                 break;
             case SctpIteratorType._5A_A_F_A_A:
-                buffer.writeUint16(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint32(args[2]);
-                buffer.writeUint16(args[3]);
-                buffer.writeUint16(args[4]);
+                buffer.writeUint16(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint32(args[2].value);
+                buffer.writeUint16(args[3].value);
+                buffer.writeUint16(args[4].value);
                 break;
             case SctpIteratorType._5A_A_F_A_F:
-                buffer.writeUint16(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint32(args[2]);
-                buffer.writeUint16(args[3]);
-                buffer.writeUint32(args[4]);
+                buffer.writeUint16(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint32(args[2].value);
+                buffer.writeUint16(args[3].value);
+                buffer.writeUint32(args[4].value);
                 break;
             case SctpIteratorType._5F_A_A_A_A:
-                buffer.writeUint32(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint16(args[2]);
-                buffer.writeUint16(args[3]);
-                buffer.writeUint16(args[4]);
+                buffer.writeUint32(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint16(args[2].value);
+                buffer.writeUint16(args[3].value);
+                buffer.writeUint16(args[4].value);
                 break;
             case SctpIteratorType._5F_A_F_A_A:
-                buffer.writeUint32(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint32(args[2]);
-                buffer.writeUint16(args[3]);
-                buffer.writeUint16(args[4]);
+                buffer.writeUint32(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint32(args[2].value);
+                buffer.writeUint16(args[3].value);
+                buffer.writeUint16(args[4].value);
                 break;
             case SctpIteratorType._5F_A_F_A_F:
-                buffer.writeUint32(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint32(args[2]);
-                buffer.writeUint16(args[3]);
-                buffer.writeUint32(args[4]);
+                buffer.writeUint32(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint32(args[2].value);
+                buffer.writeUint16(args[3].value);
+                buffer.writeUint32(args[4].value);
                 break;
             case SctpIteratorType._5F_A_A_A_F:
-                buffer.writeUint32(args[0]);
-                buffer.writeUint16(args[1]);
-                buffer.writeUint16(args[2]);
-                buffer.writeUint16(args[3]);
-                buffer.writeUint32(args[4]);
+                buffer.writeUint32(args[0].value);
+                buffer.writeUint16(args[1].value);
+                buffer.writeUint16(args[2].value);
+                buffer.writeUint16(args[3].value);
+                buffer.writeUint32(args[4].value);
                 break;
         };
 
@@ -656,7 +656,7 @@ export class SctpClient {
                 const idx = 4 + i * itCount * ScNet.sc_addr_size;
                 const r = [];
                 for (let j = 0; j < itCount; ++j)
-                    r.push(data.getResUInt32(idx + j * ScNet.sc_addr_size));
+                    r.push(new ScAddr(data.getResUInt32(idx + j * ScNet.sc_addr_size)));
                 res.push(r);
             }
 
@@ -767,10 +767,10 @@ export class SctpClient {
             for (let j = 0; j < it.args.length; ++j) {
                 if (ScNet.scIteratorIsFixedArg(it.type, j)) {
                     if (it.repl[rCount] == null)
-                        buffer.writeUint32(it.args[j]);
+                        buffer.writeUint32(it.args[j].value);
                     rCount++;
                 } else
-                    buffer.writeUint16(it.args[j]);
+                    buffer.writeUint16(it.args[j].value);
             }
         }
 
@@ -785,7 +785,7 @@ export class SctpClient {
             for (let i = 0; i < count; ++i) {
                 const item = [];
                 for (let j = 0; j < oneResultSize; ++j) {
-                    item.push(data.getResUInt32(Uint32Array.BYTES_PER_ELEMENT *(1 + i * oneResultSize + j)));
+                    item.push(new ScAddr(data.getResUInt32(Uint32Array.BYTES_PER_ELEMENT *(1 + i * oneResultSize + j))));
                 }
                 res.push(item);
             }
@@ -814,7 +814,7 @@ export class SctpClient {
         buffer.writeBuffer(buffData.buffer);
 
         return this.NewRequest(buffer.data, function(data) {
-            return data.getResUInt32(0);
+            return new ScAddr(data.getResUInt32(0));
         }, null);
     }
 

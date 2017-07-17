@@ -33,5 +33,12 @@ const client = new SctpClient('http://localhost/ws', 500,
 
 ## Changelog
 
+### v0.1.3
+- Fix construction iterator
+- Fix return values of ScAddr
+
+### v0.1.2
+- Some interfaces export fixed
+
 ### v0.1.1
 - Implement common functionality for websockets support

@@ -1,6 +1,6 @@
 {
   "name": "@ostis/sc-network",
-  "version": "0.1.1",
+  "version": "0.1.3",
   "main": "build/sc-network.js",
   "typings": "index",
   "author": "Denis Koronchik <denis.koronchik@gmail.com>",
