@@ -503,16 +503,29 @@ export class SctpClient {
         }, null);
     }
 
-    public SetLinkContent(addr: ScAddr, data: any) {
+    public SetLinkContent(addr: ScAddr, data: any, intBytes: number = 4) {
         // determine type of content and it's size
         let dataBuff = null;
         if (typeof data === 'number') {
             const size = 8;
             if (data % 1 === 0) {
                 //! @todo: support of unsigned
-                dataBuff = new ArrayBuffer(Int32Array.BYTES_PER_ELEMENT);
-                const view = new DataView(dataBuff);
-                view.setInt32(0, data, true);
+                if (intBytes === 4) {
+                    dataBuff = new ArrayBuffer(Int32Array.BYTES_PER_ELEMENT);
+                    const view = new DataView(dataBuff);
+
+                    view.setInt32(0, data, true);
+                } else if (intBytes === 2) {
+                    dataBuff = new ArrayBuffer(Int16Array.BYTES_PER_ELEMENT * 2);
+                    const view = new DataView(dataBuff);
+
+                    view.setInt16(0, data, true);
+                } else if (intBytes === 1) {
+                    dataBuff = new ArrayBuffer(Int8Array.BYTES_PER_ELEMENT * 2);
+                    const view = new DataView(dataBuff);
+
+                    view.setInt8(0, data);
+                }
             } else {
                 //! @todo: support unsigned
                 dataBuff = new ArrayBuffer(Float64Array.BYTES_PER_ELEMENT);

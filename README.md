@@ -33,6 +33,9 @@ const client = new SctpClient('http://localhost/ws', 500,
 
 ## Changelog
 
+### v0.1.4
+- Improve SetLinkContent function for a numbers
+
 ### v0.1.3
 - Fix construction iterator
 - Fix return values of ScAddr
