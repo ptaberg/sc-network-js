@@ -1,6 +1,10 @@
 ## Usage
 ```sh
-npm install --save @ostis/sc-network-js
+npm install --save @ostis/sc-network
+```
+or using Yarn
+```sh
+yarn add @ostis/sc-network
 ```
 
 Use in TypeScript:
